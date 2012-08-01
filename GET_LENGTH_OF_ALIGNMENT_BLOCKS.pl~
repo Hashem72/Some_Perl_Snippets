@@ -1,0 +1,99 @@
+# Author Hashem Koohy 19-10-2011
+#this is meant to read alignment directory (where alignment blocks are stored) and then get the alignment block 
+# lengths from their name
+
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+
+
+    
+
+    use strict;
+    use warnings;
+
+my $dir_name                        = "/lustre/scratch103/sanger/hk3/Human_Data/Pecan_Alignments/CHR_22/FASTA_22";
+my $length_of_ali_blocks_chr_22     = "/nfs/users/nfs_h/hk3/My_Perl_Scripts/length_of_ali_blocks_chr_22.txt";
+my $starting_position_of_ali_blocks = "/nfs/users/nfs_h/hk3/My_Perl_Scripts/starting_position_of_blocks_chr_22.txt";
+my $list_of_ali_blocks              = "/lustre/scratch103/sanger/hk3/Human_Data/Pecan_Alignments/22_List_of_Alignment_Files.txt";
+my @list_of_files_in_directory      = &get_list_alignment_blocks($dir_name);
+&write_list_of_aligblock_ids_int_a_file(\@list_of_files_in_directory, $list_of_ali_blocks);
+#&write_alignment_lengths_into_a_file(\@list_of_files_in_directory,$length_of_ali_blocks_chr_22);
+#&get_starting_position_of_ali_blocks(\@list_of_files_in_directory,$starting_position_of_ali_blocks);
+
+     exit;
+
+
+########################### subroutines ###########
+
+sub get_list_alignment_blocks($){
+    my $dirName      = shift;
+    
+    my @list_of_files;
+    opendir(DIR,$dirName) or die $!;
+    while(my $file = readdir(DIR)){
+	#make sure not to read sub directories
+	next unless (-f "$dirName/$file");
+	#we want only fasta files:
+	next unless($file =~ m/\.fasta/);
+	push( @list_of_files, $file);
+	  }
+	  closedir(DIR);
+	  return  @list_of_files;
+	}#get_list_alignment_blocks#
+
+sub write_alignment_lengths_into_a_file($$){
+    my $list_of_file_names_ref  = shift;
+    my $output_file_name        = shift;
+
+    my @list_of_file_names     = @$list_of_file_names_ref;
+    open(OPF,">$output_file_name" ) or die "Cannot open file $!";
+    foreach my$fn(@list_of_file_names){
+
+	#get rid of .fasta suffix:
+	$fn = (split('\.', $fn))[0];
+	my @file_splited = split('_', $fn);
+	my $length = $file_splited[2] - $file_splited[1];
+	print OPF
+	    $length,",";
+    }
+    close(OPF);
+}#write_alignment_lengths_into_a_file#
+
+
+sub get_starting_position_of_ali_blocks($$){
+    my $list_of_file_names_ref  = shift;
+    my $output_file_name        = shift;
+
+    my @list_of_file_names     = @$list_of_file_names_ref;
+    open(OPF,">$output_file_name" ) or die "Cannot open file $!";
+    foreach my$fn(@list_of_file_names){
+	
+	#get rid of .fasta suffix:
+	$fn = (split('\.', $fn))[0];
+	    my @file_splited = split('_', $fn);
+	print OPF
+	    $file_splited[1],",";
+    }
+    close(OPF);
+    
+}#get_starting_position_of_ali_blocks#
+
+sub write_list_of_aligblock_ids_int_a_file($$){
+    my $list_of_file_names_ref  = shift;
+    my $output_file_name        = shift;
+    
+    my @list_of_file_names     = @$list_of_file_names_ref;
+    open(OPF,">$output_file_name" ) or die "Cannot open file $!";
+    foreach my$fn(@list_of_file_names){
+	
+	#get rid of .fasta suffix:
+	$fn = (split('\.', $fn))[0];
+	print OPF
+		$fn,"\n";
+    }
+    close(OPF);
+    
+    
+}#write_list_of_aligblock_ids_int_a_file#

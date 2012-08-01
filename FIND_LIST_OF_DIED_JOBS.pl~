@@ -1,0 +1,49 @@
+#!/usr/bin/perl
+
+
+my $file_containing_list_of_successful_jobs = "/lustre/scratch103/sanger/hk3/Analysis_Human_Pecan/COMP_22/list_of_comp_files";
+my $file_cotaining_list_of_all_jobs         = "/lustre/scratch103/sanger/hk3/Human_Data/Pecan_Alignments/22_List_of_Alignment_Files";
+
+&GET_LIST_OF_FAILED_JOBS($file_containing_list_of_successful_jobs,$file_cotaining_list_of_all_jobs);
+exit;
+
+###################################################
+
+sub GET_LIST_OF_FAILED_JOBS($$){
+    my $done_jobs = shift;
+    my $all_jobs  = shift;
+    
+
+    my @list_of_successful_jobs = &GET_LIST_FROM_A_FILE($done_jobs);
+    my @list_of_all_jobs        = &GET_LIST_FROM_A_FILE($all_jobs);
+
+    my %done_jobs = map{$_ =>1}@list_of_successful_jobs;
+    foreach(my $job(@list_of_all_jobs)){
+	if(exists($done_jobs{$job})){
+	    print
+		$job."\n";
+	}
+	else{
+	    "failed jobs ************ ". $job."\n";
+	}
+    }
+
+
+my %params = map { $_ => 1 } @badparams;
+
+if(exists($params{$someparam})) { ... }
+
+
+}#GET_LIST_OF_FAILED_JOBS#
+
+sub GET_LIST_FROM_A_FILE($){
+    my $inputFile = shift;
+    my @list;
+    open(IN, $iputFile) or die "Cannot open file $inputFile!";
+    while(my $line = <IN>){
+	chomp($line);
+	push( @list, $line);
+    }
+    close(IN);
+    return @list;
+}#GET_LIST_FROM_A_FILE#

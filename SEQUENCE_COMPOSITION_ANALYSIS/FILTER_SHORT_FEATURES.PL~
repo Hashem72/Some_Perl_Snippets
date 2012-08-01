@@ -1,0 +1,68 @@
+
+# a following-ish command can be used to filter sequences shorter than 200bps.
+
+awk '{ if( ($3-$2)>199 )print $0   }' wgEncodeUwDnaseH1hescHotspotsRep1.bed > wgEncodeUwDnaseH1hescHotspotsRep1_no_shorther_than_200bp.bed
+
+
+
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use lib "/nfs/users/nfs_h/hk3/src/lib/perl5";
+use lib '/nfs/users/nfs_h/hk3/src/bioperl-live';
+use lib '/nfs/users/nfs_h/hk3/src/ensembl/modules';
+use lib '/nfs/users/nfs_h/hk3/src/ensembl-compara/modules';
+use lib '/nfs/users/nfs_h/hk3/src/ensembl-variation/modules';
+use lib '/nfs/users/nfs_h/hk3/src/ensembl-functgenomics/modules';
+use Bio::EnsEMBL::Registry;
+use Bio::Seq;
+use Bio::SeqIO;
+use Bio::AlignIO;
+use Bio::Perl;
+use Bio::FeatureIO;
+use Bio::Tools::GFF;
+use Bio::SeqFeature::Generic;
+
+######################### Note: ############################################################################
+#  this is to convert wig files (                                                                        #
+#                                                                                                          #
+############################################################################################################
+
+
+use IO::File;
+use Getopt::Long;
+
+use Bio::EnsEMBL::Registry;
+
+
+
+my ($input_file, $output_file, $length_threshold, $data_source, $data_type , $Chr);
+my $help= '';
+if(!GetOptions('input_file|i=s'       =>\$input_file,
+	       'output_file|o=s'      => \$output_file,
+	       'length_threshold|l=s' => \$length_threshold,
+	       'data_source|s=s'      => \$data_source,
+	       'data_type|t=s'        => \$data_type,
+               'chr|c=s'              => \$Chr,
+               'help|h'               => \$help)
+ || !(defined($input_file) && defined($output_file) && defined($length_threshold) && defined($data_type) && defined($Chr)   ) || $help )
+{
+    print <<END_USAGE;
+Usage:
+$0  --input_file=input_file --output_file=output_file --length_threshold=length_threshold --data_source=data_source --data_type=data_type --Chr=chr
+$0  --help
+--input_file       /-i  Name of input file which is in Wig (or bed three collumns:chr start and end).
+--output_file      /-o  Name of output file which will be as a gff(chr data source start end startn data type ).
+--length_threshold /-l  Sequences shorter than this in wig file will not be considered.Put zero if you want each sequence to be considered.
+--data_source      /-s  Data source, call it what ever you like.
+--data_type        /-t  Data type: whatever you like.
+--chr             /-c  chromosome name: example: chr22
+--help             /-h  To see this text.
+Example usage:
+$0 -i inputfile.wig -o outputfile.gff -l 200 -s a_text_here -t anohter_text_here -c chr22
+END_USAGE
+exit(1);
+}#end of if#
+
+
