@@ -171,9 +171,20 @@ sub GET_COMPOSITION_OF_TAGS($$$$$){
 	my $score       = $one_feat->{Score};
 	my $strand      = $one_feat->{Strand};
 	
+	my $new_start;
+        # if it is on positive strand, get back the same as offset length
+	if($strand eq "+"){
+	    $new_start = $start-$start_offset;
+	}
+	#if it is on negative starnad, start form real start but get more seq from three prime end
+	elsif($strand eq "-"){
+	    $new_start = $start;
+	}
+	else{
+	    die "unkwon stradn at: $start \t $end \t $source_tag \t $score \t $strand \n";
+	}
 	
-
-	my $new_start = $start-$start_offset;
+#	my $new_start = $start-$start_offset;
 	my $seq_stretch = uc(substr($chr_seq,$new_start,$new_length));
 	next if( $seq_stretch =~ m/N/);
 	my $seq_length = length($seq_stretch);
