@@ -171,6 +171,7 @@ sub GET_COMPOSITION_OF_TAGS($$$$$){
 	my $score       = $one_feat->{Score};
 	my $strand      = $one_feat->{Strand};
 	
+	
 	my $new_start;
         # if it is on positive strand, get back the same as offset length
 	if($strand eq "+"){
@@ -194,6 +195,8 @@ sub GET_COMPOSITION_OF_TAGS($$$$$){
 	if($strand eq "-"){
 	    $seq_stretch = &GET_REVCOMP($seq_stretch);
 	}
+	
+
 	for(my $p=0; $p<$new_length;$p++){
 	    my $one_base = substr($seq_stretch,$p,1);
 	    if($one_base eq "A"){
@@ -226,6 +229,8 @@ sub GET_COMPOSITION_OF_TAGS($$$$$){
 	print OUT
 	    "\n";
     }
+
+
 }#GET_COMPOSITION_OF_TAGS#
 
 

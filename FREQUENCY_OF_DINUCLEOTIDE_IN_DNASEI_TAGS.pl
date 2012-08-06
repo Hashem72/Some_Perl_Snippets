@@ -639,7 +639,8 @@ sub GET_FREQ_OF_DINUCLEOTIDE_OVER_TAGS_IN_A_FASTQ_FILE_V4($$$$$){
 	my $seq_slice =  $slice_adaptor->fetch_by_region('chromosome',$chr,$start,$end);
 	my $seq = uc($seq_slice->seq());
 	if($strand eq "-"){
-	    $seq = reverse $seq;
+	   # $seq = reverse $seq;
+	    $seq  = &GET_REVCOMP($seq);
 	}
 	next if ($seq =~ m/N/);
 	my $seq_length = length($seq);
@@ -921,5 +922,13 @@ sub TEST_MATRIX($$){
     }
 }#TEST_MATRIX#
 
+
+sub GET_REVCOMP($){
+    my $dna_seq  = shift;
+    
+    my $revcom_seq = reverse $dna_seq;
+    $revcom_seq =~ tr/ACGTacgt/TGCAtgca/;
+    return $revcom_seq;
+		}#GET_REVCOMP#
 
 
