@@ -41,7 +41,7 @@ $registry->load_registry_from_db(
 #(and also some nucleotides just after the 3prime side of tags in negative strands). Now we think these nucleotides will                                  #
 # help us to discriminate biased tags from non-biased better.                                                                                              #
 # therefore for each given tag if it is in pve strand it will move to start-offset, end-offset, if it is in nve strand it will move                        #
-#to start+offset, end+offset and then thes new fake tags will be scored (compared to background model). note that finally we will write our original tag   #
+#to start+offset, end+offset and then these new fake tags will be scored (compared to background model). note that finally we will write our original tag   #
 # coordiantes into output files and not these fake coordiantes.                                                                                            #
 ############################################################################################################################################################
 
@@ -82,7 +82,7 @@ print
   "chromosome sequence fetched\n";
 my @matrix_of_compositions_of_real_tags  = &GET_PWM($chr_seq,$tags_input_file,$output_file_name,36,$offset,$prior_probability,"real",0);
 
-my @matrix_of_compositions_of_moved_tags = &GET_PWM($chr_seq,$tags_input_file,$output_file_name,36,0,$prior_probability,"background",10);
+my @matrix_of_compositions_of_moved_tags = &GET_PWM($chr_seq,$tags_input_file,$output_file_name,36,0,$prior_probability,"background",100);
 &GET_BIASNESS_SCORE_FOR_TAGS_V2($chr_seq,$tags_input_file,$output_file_name,\@matrix_of_compositions_of_real_tags,\@matrix_of_compositions_of_moved_tags,36,$offset);
 exit;
 
@@ -139,18 +139,20 @@ sub GET_PWM($$$$$$$$){
 
    
 
-    $transforming_length =0 unless defined($transforming_length);
+    $transforming_length = 0 unless defined($transforming_length);
     my %unique_tags = &GET_UNIQUE_FEATURES_FROM_A_BED_FILE_V2($input_file);
     my $number_seqs_with_ns =0;
    
     #declare and assign zero to the matrix:
     my @com_matrix;
-    for(my $r=0; $r< $tag_length;$r++ ){
+    for(my $r=0; $r< $tag_length; $r++ ){
 	for(my $c=0; $c<4; $c++){
 	    $com_matrix[$r][$c]=0;
 	}
     }
     my $number_of_unique_tags = keys  %unique_tags;
+    print 
+	"There were ". $number_of_unique_tags." unque tags.\n";
     foreach my$key(keys %unique_tags){
 	my $one_feat = $unique_tags{$key};
 	my $chr         = $one_feat->{Chr};
@@ -213,7 +215,7 @@ sub GET_PWM($$$$$$$$){
 #make position wieght matrix
     for(my $r=0;$r< $tag_length; $r++){
 	for(my $c=0; $c<4;$c++){
-	    #note: ln { (n_ij+p_i)/(N+1)*p_i } is almost equal to ln( (n_ij)/p_i ) where p_i is prior probability. this is in fact a scaling up, to get
+	    #note: ln { (n_ij+p_i)/(N+1)*p_i } is almost equal to ln( (f_ij)/p_i ) where p_i is prior probability and f_ij = n_ij/N. this is in fact a scaling up, to get
 #rid of gettin ln of zero.
 	    $com_matrix[$r][$c] = &log2(($com_matrix[$r][$c] +$prior_prob  ) / ( ($number_of_unique_tags+1)*$prior_prob )  );
 	   #theoritically we shouldn have scores bigger than 2 if prior_prob is taken equal to 0.25
@@ -228,7 +230,7 @@ sub GET_PWM($$$$$$$$){
 $output =~ s/.bed/_BG_PWM.txt/;
     }
     else{
-	die "for parameter only real and background is acceptable for model parameter!\n";
+	die " Only real and background is acceptable for model parameter!\n";
     }
  my $pwm_testing_file = $output;
     
@@ -282,7 +284,7 @@ sub GET_UNIQUE_FEATURES_FROM_A_BED_FILE($){
 }#GET_UNIQUE_FEATURES_FROM_A_BED_FILE#
 
 sub GET_UNIQUE_FEATURES_FROM_A_BED_FILE_V2($){
-    #Note: the uniqueness is defined based on start and strand, ie if two features have same start and strand then they are considered equal. and this is the
+    #Note: the uniqueness is defined based on chr, start, strand and source, ie if two features have same start and strand then they are considered equal. and this is the
     #difference between this subroutine and its version of 1 where the uniqueness was only based on start position of the feature.
 
     my $input_bed_file  = shift;
@@ -301,19 +303,20 @@ sub GET_UNIQUE_FEATURES_FROM_A_BED_FILE_V2($){
 	my $score  = $line_spec[4];
 	my $strand = $line_spec[5];
 	
-	my $one_key = $strand.$start;
+	
+	my $one_key = $chr.$strand.$start.$source;
 	if( !( ($chr) && ($start) && ($end) && ($score) && ($source) && ($strand)  )  ){
 	    print
 		$line."\n";
 	    die "required six columns to be defined but in the above mentioned line that wasnt the case\n";
 	}
 	my $one_object = {
-	    Chr => $chr,
-	    Start => $start,
-	    End   =>$end,
-	    Source => $source,
-	    Score  => $score,
-	    Strand => $strand
+	    Chr     => $chr,
+	    Start   => $start,
+	    End     => $end,
+	    Source  => $source,
+	    Score   => $score,
+	    Strand  => $strand
 	};
 	$unique_features{$one_key}= $one_object;
     }
@@ -393,8 +396,9 @@ sub GET_BIASNESS_SCORE_FOR_TAGS_V2($$$$$$$){
 
 
 
-sub log2(){
+sub log2($){
     my $n = shift;
+
     my $L = (log($n))/(log(2));
     return $L;
 }#log2#
