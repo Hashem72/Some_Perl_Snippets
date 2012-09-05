@@ -50,7 +50,7 @@ my $help = '';
 if(!GetOptions('species|s=s'             => \$species,
 	       'chr|c=s'                 => \$chr,
 	       'tag_length|l=s'          => \$tag_length,
-	        'tags_input_file|i=s'    => \$tags_input_file,
+	        'tags_input_file|i=s'     => \$tags_input_file,
                'output_file_name|o=s'    => \$output_file_name,
                 'offset|f=s'             => \$offset,
 	       'repeatmaski|r=s'         => \$repeatmask,
@@ -80,10 +80,10 @@ my $prior_probability                    = 0.25;
 my $chr_seq                              = &GET_CHROMOSOME_SEQUENCE($species,$chr,$repeatmask);
 print 
   "chromosome sequence fetched\n";
-my @matrix_of_compositions_of_real_tags  = &GET_PWM($chr_seq, $tags_input_file, $output_file_name, 15, $offset, $prior_probability, "real", 0);
+my @matrix_of_compositions_of_real_tags  = &GET_PWM($chr_seq,$tags_input_file,$output_file_name,36,$offset,$prior_probability,"real",0);
 
-my @matrix_of_compositions_of_moved_tags = &GET_PWM($chr_seq, $tags_input_file, $output_file_name, 15, 0, $prior_probability, "background", 100);
-&GET_BIASNESS_SCORE_FOR_TAGS_V2($chr_seq, $tags_input_file, $output_file_name, \@matrix_of_compositions_of_real_tags, \@matrix_of_compositions_of_moved_tags, 15, $offset);
+my @matrix_of_compositions_of_moved_tags = &GET_PWM($chr_seq,$tags_input_file,$output_file_name,36,0,$prior_probability,"background",100);
+&GET_BIASNESS_SCORE_FOR_TAGS_V2($chr_seq,$tags_input_file,$output_file_name,\@matrix_of_compositions_of_real_tags,\@matrix_of_compositions_of_moved_tags,36,$offset);
 exit;
 
 
@@ -424,7 +424,7 @@ sub GET_PROBABILITY_OF_SEQUENCE_GIVEN_PWM ($$$){
     my $pwm_ref       = shift;
     my $seq           = shift;
     my $seq_length    = shift;
-
+    
     #dereference
     my @pwm        = @$pwm_ref;
    

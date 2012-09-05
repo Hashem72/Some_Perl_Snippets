@@ -1,0 +1,21 @@
+package PrintingTools;
+use strict;
+use warnings;
+############################ subroutines #######################
+sub print_out_a_matrix($){
+    my $matrix = shift;
+    
+    my $numbero_of_rows = @{$matrix};
+    my $number_of_cols =  @{$matrix->[0]};
+    for (my $r = 0; $r < $numbero_of_rows; $r++) {
+	for (my $c = 0; $c < $number_of_cols; $c++) {
+	    printf("%.5f ", $matrix->[$r][$c]);
+	}
+	print
+	    "\n";
+    }
+}#print_out_a_matirx#
+
+
+1;
+
