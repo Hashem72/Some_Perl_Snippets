@@ -8,29 +8,51 @@ use FileTools;
 use SeqTools;
 use MathsTools;
 use PrintingTools;
-
+my $data_centre = "UW";
+my $cell_line = "H1hesc";
 
 my $prior_probs     = [0.24, 0.26, 0.26, 0.24];
-my $bed_file        = "/nfs/th_group/hk3/UW_DNaseI_HS/Gm12878/wgEncodeUwDnaseGm12878AlnRep1_chr22.bed";
-my $pwm_real_tags_file  = "/nfs/th_group/hk3/UW_DNaseI_HS/Gm12878_For_Paper_Analyis/pwm_real_tags.txt";
-my $pwm_shifte_tags_file  = "/nfs/th_group/hk3/UW_DNaseI_HS/Gm12878_For_Paper_Analyis/pwm_shifted_tags.txt";
+my $tag_lenghts;
+my $bed_file;
+my $pwm_real_tags_file;
+my $pwm_shifte_tags_file;
+if ($data_centre eq "UW") {
+     $tag_lenghts     = 36;  
+     $bed_file        = "/nfs/th_group/hk3/UW_DNaseI_HS/".$cell_line."/wgEncodeUwDnase".$cell_line."AlnRep1_chr22.bed";
+     $pwm_real_tags_file  = "/nfs/th_group/hk3/UW_DNaseI_HS/".$cell_line."_For_Paper_Analysis/pwm_real_tags.txt";
+     $pwm_shifte_tags_file  = "/nfs/th_group/hk3/UW_DNaseI_HS/".$cell_line."_For_Paper_Analysis/pwm_shifted_tags.txt";
+}
+elsif($data_centre eq "Duke"){
+    
+    $tag_lenghts     = 20;
+    $bed_file        = "/nfs/th_group/hk3/Duke_DNaseI_HS/".$cell_line."/wgEncodeOpenChromDnase".$cell_line."AlnRep1_chr22.bed";
+    $pwm_real_tags_file  = "/nfs/th_group/hk3/Duke_DNaseI_HS/".$cell_line."_For_Paper_Analysis/pwm_real_tags.txt";
+    $pwm_shifte_tags_file  = "/nfs/th_group/hk3/Duke_DNaseI_HS/".$cell_line."_For_Paper_Analysis/pwm_shifted_tags.txt";
+}
+else{
+    die "Unknown data centre!\n";
+}
+
+
+
+
+
 my %unique_features = &FileTools::GET_UNIQUE_FEATURES_FROM_A_BED_FILE_V2($bed_file);
 my $unique_features = keys %unique_features;
 print
-    "found ". $unique_features . " unique tags for k562\n";
+    "found ". $unique_features . " unique tags\n";
 
 my $Human_chr_22             = &Ensembl::GET_CHROMOSOME_SEQUENCE("Human","22","false");
-my $freq_matrix_real_tags    = &get_position_frequency_matrix($bed_file, 10, 4, 0, $Human_chr_22, 36);
+my $freq_matrix_real_tags    = &get_position_frequency_matrix($bed_file, 10, 4, 0, $Human_chr_22, $tag_lenghts);
 my $pwm_real_tags            = &MathsTools::pfm2pwm($freq_matrix_real_tags, $prior_probs);
 
 
-my $freq_matrix_shifted_tags =  &get_position_frequency_matrix($bed_file, 10, 4, 40, $Human_chr_22, 36);
+my $freq_matrix_shifted_tags =  &get_position_frequency_matrix($bed_file, 10, 4, 40, $Human_chr_22, $tag_lenghts);
 
 my $pwm_shifted_tags         = &MathsTools::pfm2pwm($freq_matrix_shifted_tags, $prior_probs );
 
 
-print
-    "here is freq matrix for real tags:\n";
+
 #&MathsTools::get_get_total_number_of_seqs_used_in_freq_matrix($freq_matrix_real_tags);
 #&PrintingTools::print_out_a_matrix($pwm_real_tags );
 &PrintingTools::print_out_a_matrix_into_a_file($pwm_real_tags, $pwm_real_tags_file, ",");
@@ -46,6 +68,8 @@ print
 #     "rows are : $number_of_rows\n and number of collumns is $number_of_cols\n";
 
 exit;
+
+
 
 #####################################  SUBROUTINES ###################
 

@@ -6,6 +6,23 @@ use warnings;
 
 ########################    subroutines ########################## 
 
+sub get_an_array_of_random_integers($$$){
+    my $min       = shift;
+    my $max       = shift;
+    my $number    = shift;
+    
+    my @rand_integers = ();
+    
+    my $range = $max - $min;
+    my $size = 0;
+    while($size < $number){
+	my $one_rand = int(rand($range)) + $min;
+	push(@rand_integers,$one_rand);
+	$size = @rand_integers;
+    }
+    return @rand_integers;
+		       }#get_an_array_of_random_integers#
+
 sub log2($){
     my $n = shift;
 

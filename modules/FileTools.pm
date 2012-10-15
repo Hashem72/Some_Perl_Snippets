@@ -5,6 +5,7 @@ use warnings;
 
 ############################ subroutine #################
 
+
 sub get_seq_from_fasta_file($$){
     my $fasta_file_name   = shift;
     my $seq_id            = shift;
@@ -43,7 +44,7 @@ sub GET_UNIQUE_FEATURES_FROM_A_BED_FILE_V2($){
 	
 	
 	my $one_key = $chr.$strand.$start.$source;
-	if( !( ($chr) && ($start) && ($end) && ($score) && ($source) && ($strand)  )  ){
+	if( !( defined($chr) && defined($start) && defined($end) && defined($score) && defined($source) && defined($strand)  )  ){
 	    print
 		$line."\n";
 	    die "required six columns to be defined but in the above mentioned line that wasnt the case\n";

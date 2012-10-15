@@ -1,0 +1,83 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+
+## Note: this is to read a bed file with bias score and then seperate them into two files. Please also note that
+# because the hotspot algoithm uses a fake bed file "chr start start+1", the output of this code will be a fake
+#bed file. the most important point to note is that if a feature sits in negative strand then in new faked bed file
+#it will be as "chr end end+1" whereas if it sits in po've strand then it will be as "chr start start+1"
+
+my $cell_line = "K562";
+my $tag_resource = "UW";
+
+
+
+my $separation_threshold = -0.3;
+my    $input_bed_file;
+
+
+if($tag_resource eq "UW"){
+
+    $input_bed_file     = "/nfs/th_group/hk3/".$tag_resource."_DNaseI_HS/".$cell_line."_For_Paper_Analysis/wgEncodeUwDnase".$cell_line."AlnRep1_chr22_with_biasness_scores.bed";
+   
+    
+}
+
+elsif($tag_resource eq "Duke"){
+    $input_bed_file     = "/nfs/th_group/hk3/".$tag_resource."_DNaseI_HS/".$cell_line."_For_Paper_Analysis/wgEncodeOpenChromDnase".$cell_line."AlnRep1_chr22_with_biasness_scores.bed";
+}
+else{
+    die "Unknown tag resource!\n";
+}
+
+my $path_to_output_files  = "/nfs/th_group/hk3/".$tag_resource."_DNaseI_HS/".$cell_line."_For_Paper_Analysis";
+
+my $file_of_unbiased_tags = $path_to_output_files."/tags_with_score_less_than_".$separation_threshold.".bed";
+my $file_of_biased_tags   = $path_to_output_files."/tags_with_score_greater_than_".$separation_threshold.".bed";
+    
+
+open(IN,"$input_bed_file") or die "cannot open $input_bed_file to read the file!\n";
+open(BIASED, ">$file_of_biased_tags") or die "cannot open $file_of_biased_tags to write in\n";
+open(UNBIASED, ">$file_of_unbiased_tags") or die "cannot open file $file_of_unbiased_tags to write in\n";
+while (<IN>) {
+    chomp $_;
+    my @fields = split("\t",$_);
+    my $chr    = $fields[0];
+    my $start  = $fields[1];
+    my $end    = $fields[2];
+    my $source = $fields[3];
+    my $score  = $fields[4];
+    my $strand = $fields[5];
+    if (  !(defined($chr) && defined($start) && defined($end) && defined($source) && defined($score) && defined($strand))   ) {
+	die "required six columns but it didn't get it at $_ \n";
+    }
+    my $new_start;
+    my $new_end;
+    if ($strand eq "+") {
+	$new_start = $start;
+	$new_end   = $new_start+1;
+    }
+    elsif($strand eq "-"){
+	$new_start = $end;
+	$new_end   = $new_start+1
+    }
+    else{
+	die "unknown strand at $_ \n";
+    }
+    my $one_feature = $chr."\t".$new_start."\t".$new_end."\n";
+    if ($score >= $separation_threshold) {
+	print BIASED
+	    $one_feature;	
+    }
+    else{
+	print UNBIASED
+	    $one_feature;
+    }
+}
+
+close(IN);
+close(BIASED);
+close(UNBIASED);
+
+exit;
