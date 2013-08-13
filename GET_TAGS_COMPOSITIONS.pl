@@ -8,6 +8,7 @@ use lib '/nfs/users/nfs_h/hk3/src/ensembl/modules';
 use lib '/nfs/users/nfs_h/hk3/src/ensembl-compara/modules';
 use lib '/nfs/users/nfs_h/hk3/src/ensembl-variation/modules';
 use lib '/nfs/users/nfs_h/hk3/src/ensembl-functgenomics/modules';
+use lib "/nfs/users/nfs_h/hk3/My_Perl_Scripts/modules";
 use Bio::EnsEMBL::Registry;
 use Bio::Seq;
 use Bio::SeqIO;
@@ -19,6 +20,12 @@ use Bio::SeqFeature::Generic;
 
 use IO::File;
 use Getopt::Long;
+
+use FileTools;
+use SeqTools;
+use MathsTools;
+use PrintingTools;
+
 
 
 
@@ -107,36 +114,36 @@ sub GET_CHROMOSOME_SEQUENCE($$$){
 			    }# GET_CHROMOSOME_SEQUENCE#
 
 
-sub GET_UNIQUE_FEATURES_FROM_A_BED_FILE($){
-    my $input_bed_file     = shift;
+# sub GET_UNIQUE_FEATURES_FROM_A_BED_FILE($){
+#     my $input_bed_file     = shift;
 
 
-    open(IN ,$input_bed_file ) or die "Cannot open file $input_bed_file for reading data\n";
-    my @lines = <IN>;
-    close(IN);
-    my %unique_features;
-    foreach my $line( @lines){
-	chomp($line);
-	my @line_spec = split("\t", $line);
-	my $chr    = $line_spec[0];
-	my $start  = $line_spec[1];
-	my $end    = $line_spec[2];
-	my $source = $line_spec[3];
-	my $score  = $line_spec[4];
-	my $strand = $line_spec[5];
-	my $one_object = {
-	    Chr => $chr,
-	    Start => $start,
-	    End   =>$end,
-	    Source => $source,
-	    Score  => $score,
-	    Strand => $strand
-	};
-	$unique_features{$start}= $one_object;
-    }
+#     open(IN ,$input_bed_file ) or die "Cannot open file $input_bed_file for reading data\n";
+#     my @lines = <IN>;
+#     close(IN);
+#     my %unique_features;
+#     foreach my $line( @lines){
+# 	chomp($line);
+# 	my @line_spec = split("\t", $line);
+# 	my $chr    = $line_spec[0];
+# 	my $start  = $line_spec[1];
+# 	my $end    = $line_spec[2];
+# 	my $source = $line_spec[3];
+# 	my $score  = $line_spec[4];
+# 	my $strand = $line_spec[5];
+# 	my $one_object = {
+# 	    Chr => $chr,
+# 	    Start => $start,
+# 	    End   =>$end,
+# 	    Source => $source,
+# 	    Score  => $score,
+# 	    Strand => $strand
+# 	};
+# 	$unique_features{$start}= $one_object;
+#     }
 
-     return %unique_features;
-}#GET_UNIQUE_FEATURES_FROM_A_BED_FILE#
+#      return %unique_features;
+# }#GET_UNIQUE_FEATURES_FROM_A_BED_FILE#
 
 
 
@@ -149,8 +156,8 @@ sub GET_COMPOSITION_OF_TAGS($$$$$){
     my $tag_length = shift;
     my $start_offset = shift;
     
-
-    my %unique_tags = &GET_UNIQUE_FEATURES_FROM_A_BED_FILE($input_file);
+ my %unique_tags = &FileTools::GET_UNIQUE_FEATURES_FROM_A_BED_FILE_V2($input_file);
+   # my %unique_tags = &GET_UNIQUE_FEATURES_FROM_A_BED_FILE($input_file);
 
     my $new_length = $tag_length + $start_offset; 
     #declare and assign zero to the matrix:
@@ -176,10 +183,12 @@ sub GET_COMPOSITION_OF_TAGS($$$$$){
         # if it is on positive strand, get back the same as offset length
 	if($strand eq "+"){
 	    $new_start = $start-$start_offset;
+	    
 	}
 	#if it is on negative starnad, start form real start but get more seq from three prime end
 	elsif($strand eq "-"){
 	    $new_start = $start;
+	    
 	}
 	else{
 	    die "unkwon stradn at: $start \t $end \t $source_tag \t $score \t $strand \n";
@@ -193,7 +202,7 @@ sub GET_COMPOSITION_OF_TAGS($$$$$){
 	    die "seq length  $seq_length is not matching with $new_length +1\n";
 	}
 	if($strand eq "-"){
-	    $seq_stretch = &GET_REVCOMP($seq_stretch);
+	    $seq_stretch = &SeqTools::get_revcomp($seq_stretch);
 	}
 	
 

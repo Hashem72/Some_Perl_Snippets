@@ -34,7 +34,8 @@ my $registry = 'Bio::EnsEMBL::Registry';
 #load registry
 $registry->load_registry_from_db(
     -host => 'ensembldb.ensembl.org',
-    -user => 'anonymous'
+    -user => 'anonymous',
+    -port => '5306'
     );
 
 

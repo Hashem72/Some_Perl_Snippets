@@ -55,6 +55,42 @@ sub pfm2pwm($$){
     return $pwm;
 }#pfm2pwm#
 
+
+sub pssm2transfac_format($$$$){
+    my $pssm      = shift;
+    my $id        = shift;
+    my $species   = shift;
+    my $output_file = shift;
+
+    open(OUT, ">$output_file") or die "cannot open file $output_file to write into it!\n";
+    print OUT "ID"." ".$id."\n";
+    print OUT "BF"." ".$species."\n";
+    print OUT "P0\tA\tC\tG\tT\n";
+    
+
+    my $number_of_rows = @{$pssm};
+    my $number_of_cols = @{$pssm->[0]};
+    my $counter        = 0; 
+    for(my $r=0; $r < $number_of_rows; $r++){
+	if($r<10){
+	  $counter = "0".$r;  
+	}
+	else{
+	    $counter = $r;
+	}
+	print OUT $counter."\t";
+	for(my $c =0; $c < $number_of_cols; $c++){
+	    print OUT $pssm->[$r][$c]."\t";
+	}
+	print OUT "\n";
+    }
+    print OUT "XX\n";
+    print OUT "//";
+    close(OUT);
+}#pssm2transfac_format#
+
+
+
 sub get_get_total_number_of_seqs_used_in_freq_matrix($){
     my $freq_matrix   = shift;
 
@@ -75,7 +111,8 @@ sub get_prob_seq_given_pwm($$$$){
     my $end_point  = $start + $subseq_length ;
     my $seq_length = length($seq);
     if($end_point > $seq_length){
-	die "end of subsequence greater than end of sequence!\n";
+    
+	die "end of subsequence greater than end of sequence(tag)!\n";
     }
     my $sum        = 0;
     for (my $p = $start; $p < $end_point; $p++) {

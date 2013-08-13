@@ -10,8 +10,11 @@ use MathsTools;
 use PrintingTools;
 
 
-my $tag_resource = "UW";
-my $cell_line    = "H1hesc";
+my $tag_resource = "Duke";
+my $cell_line    = "Gm12878";
+my $Rep          = "rep1";
+my $start_of_stretch = 5; # this is the start of the stretch of the seq you would like to be considered 
+my $length_of_stretch = 15;  # the length of the stretch you want to be considered
 
 my $start_offset;
 my $end_offset;
@@ -23,18 +26,33 @@ my $pwm_file_bg ;
 if($tag_resource eq "UW"){
     $start_offset =  10;
     $end_offset   = 4;
+
+
     $tags_bed_file = "/nfs/th_group/hk3/UW_DNaseI_HS/".$cell_line."/wgEncodeUwDnase".$cell_line."AlnRep1_chr22.bed";
-    $tags_bed_file_with_biasness_scores  = "/nfs/th_group/hk3/UW_DNaseI_HS/".$cell_line."_For_Paper_Analysis/wgEncodeUwDnase".$cell_line."AlnRep1_chr22_with_biasness_scores.bed";
-    $pwm_file_real = "/nfs/th_group/hk3/UW_DNaseI_HS/".$cell_line."_For_Paper_Analysis/pwm_real_tags.txt";
-    $pwm_file_bg   = "/nfs/th_group/hk3/UW_DNaseI_HS/".$cell_line."_For_Paper_Analysis/pwm_shifted_tags.txt";
+     $tags_bed_file_with_biasness_scores  = "/nfs/th_group/hk3/UW_DNaseI_HS/".$cell_line."_For_Paper_Analysis/wgEncodeUwDnase".$cell_line."Aln".$Rep."_chr22_with_bias_scores_offset_5_length_15.bed";
+    
+     $pwm_file_real = "/nfs/th_group/hk3/UW_DNaseI_HS/".$cell_line."_For_Paper_Analysis/pwm_real_tags_".$Rep.".txt";
+     $pwm_file_bg   = "/nfs/th_group/hk3/UW_DNaseI_HS/".$cell_line."_For_Paper_Analysis/pwm_shifted_tags_".$Rep.".txt";
+
+
+############# following lines were added to look at histones as a control set #####################
+    # $tags_bed_file = "/nfs/th_group/hk3/wgEncodeUwHistone/".$cell_line."_Histone/wgEncodeUwHistone".$cell_line."H3k4me3StdAlnRep1_chr22.bed";
+    #$tags_bed_file_with_biasness_scores  = "/nfs/th_group/hk3/wgEncodeUwHistone/".$cell_line."_Histone/wgEncodeUwDnase".$cell_line."H3k4me3StdAlnRep1_chr22_with_bias_scores_offset_5_length_15.bed";
+    
+    # $pwm_file_real = "/nfs/th_group/hk3/wgEncodeUwHistone/".$cell_line."_Histone/pwm_real_tags_".$Rep.".txt";
+    #$pwm_file_bg   = "/nfs/th_group/hk3/wgEncodeUwHistone/".$cell_line."_Histone/pwm_shifted_tags_".$Rep.".txt";
+
+#################################################################################################################
 }
 elsif($tag_resource eq "Duke"){
     $start_offset =  15;
     $end_offset   = 15;
     $tags_bed_file = "/nfs/th_group/hk3/Duke_DNaseI_HS/".$cell_line."/wgEncodeOpenChromDnase".$cell_line."AlnRep1_chr22.bed";
-    $tags_bed_file_with_biasness_scores  = "/nfs/th_group/hk3/Duke_DNaseI_HS/".$cell_line."_For_Paper_Analysis/wgEncodeOpenChromDnase".$cell_line."AlnRep1_chr22_with_biasness_scores.bed";
-    $pwm_file_real = "/nfs/th_group/hk3/Duke_DNaseI_HS/".$cell_line."_For_Paper_Analysis/pwm_real_tags.txt";
-    $pwm_file_bg   = "/nfs/th_group/hk3/Duke_DNaseI_HS/".$cell_line."_For_Paper_Analysis/pwm_shifted_tags.txt";
+    $tags_bed_file_with_biasness_scores  = "/nfs/th_group/hk3/Duke_DNaseI_HS/".$cell_line."_For_Paper_Analysis/wgEncodeOpenChromDnase".$cell_line."Aln".$Rep."_chr22_with_bias_scores_offset_5_length_15.bed";
+    $pwm_file_real = "/nfs/th_group/hk3/Duke_DNaseI_HS/".$cell_line."_For_Paper_Analysis/pwm_real_tags_".$Rep.".txt";
+    $pwm_file_bg   = "/nfs/th_group/hk3/Duke_DNaseI_HS/".$cell_line."_For_Paper_Analysis/pwm_shifted_tags_".$Rep.".txt";
+    
+
 
 }
 else{
@@ -45,7 +63,9 @@ my $chr_22 = &FileTools::get_seq_from_fasta_file("/nfs/th_group/hk3/Human_CHRS/c
 
 my $pwm_real      = &FileTools::read_in_a_matrix_from_a_file($pwm_file_real);
 my $pwm_bg        =  &FileTools::read_in_a_matrix_from_a_file($pwm_file_bg);
-&get_tags_bias_scores($chr_22, $tags_bed_file, $tags_bed_file_with_biasness_scores, $pwm_real, $pwm_bg, $start_offset, $end_offset, 6, 9);
+print "Here is the output file: ". $tags_bed_file_with_biasness_scores. "\n";
+&get_tags_bias_scores($chr_22, $tags_bed_file, $tags_bed_file_with_biasness_scores, $pwm_real, $pwm_bg, $start_offset, $end_offset, $start_of_stretch, $length_of_stretch );
+print "job successfully done\n";
 exit;
 
 

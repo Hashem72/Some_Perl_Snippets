@@ -1,0 +1,44 @@
+found 301962 unique tags
+Found 4 of seqs containing at least one N!
+number_of_seqs_in_used is 301958 
+Found 3 of seqs containing at least one N!
+number_of_seqs_in_used is 301959 
+here is the freq  matrix for shifted tags:
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@bc-13-2-01>
+Subject: Job 547196: <perl get_pfm_and_pwms.pl> Done
+
+Job <perl get_pfm_and_pwms.pl> was submitted from host <farm2-head3> by user <hk3> in cluster <farm2>.
+Job was executed on host(s) <bc-13-2-01>, in queue <normal>, as user <hk3> in cluster <farm2>.
+</nfs/users/nfs_h/hk3> was used as the home directory.
+</nfs/users/nfs_h/hk3/My_Perl_Scripts> was used as the working directory.
+Started at Wed May  1 17:40:53 2013
+Results reported at Wed May  1 17:41:48 2013
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+perl get_pfm_and_pwms.pl
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time   :     42.25 sec.
+    Max Memory :       849 MB
+    Max Swap   :       930 MB
+
+    Max Processes  :         3
+    Max Threads    :         4
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file <fair_output_547196.err> for stderr output of this job.
+
